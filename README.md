@@ -39,3 +39,8 @@ Skapa en applikation där man skickar in en samling artiklar och få svar på vi
 ## Krav för app:
 - Lösningen skall ha enhetstester
 - Lösningen skall vara gjord i SpringBoot
+
+## Instruktioner för användning
+Kör jar-filen med 1 Sträng-argument i följande form (exempel): "6 st artikel 7, 2 st artikel 4, 4 st artikel 1".
+Programmet skriver då ut vilken kartong som bör användas, i detta fall "kartong nr 2".
+Om ingen lämplig kartong finnes, så skrivs "Upphämtning krävs" ut.

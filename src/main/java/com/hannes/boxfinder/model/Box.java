@@ -17,4 +17,11 @@ public enum Box {
     public int getSize() {
         return width * length;
     }
+
+    public static Box getBoxFromNr(int number) {
+        if (number < values().length) {
+            return values()[number - 1];
+        }
+        return null;
+    }
 }

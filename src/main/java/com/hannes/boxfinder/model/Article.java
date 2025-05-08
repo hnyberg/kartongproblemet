@@ -17,20 +17,12 @@ public enum Article {
     EIGHT(5),
     NINE(9);
 
-    private final int length;
+    private final int size;
 
-    public static Article getarticleFromNr(int number) {
-        return switch (number) {
-            case 1 -> ONE;
-            case 2 -> TWO;
-            case 3 -> THREE;
-            case 4 -> FOUR;
-            case 5 -> FIVE;
-            case 6 -> SIX;
-            case 7 -> SEVEN;
-            case 8 -> EIGHT;
-            case 9 -> NINE;
-            default -> null;
-        };
+    public static Article getArticleFromNr(int number) {
+        if (number <= values().length) {
+            return values()[number - 1];
+        }
+        return null;
     }
 }

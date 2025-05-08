@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 public class BoxFinder {
 
     public static final String DENIED = "Upphämtning krävs";
-    public static final String BOX_PREFIX = "Kartong nr";
+    public static final String BOX_PREFIX = "kartong nr";
     public static final Pattern INPUT_PATTERN = Pattern.compile("^\\d+\\s+st artikel\\s+\\d+$");
 
     public static String findBox(String[] args) {
@@ -42,22 +42,21 @@ public class BoxFinder {
     }
 
     static Map<Integer, Integer> getArticleSizesFromInput(List<String> args) {
-        Map<Integer, Integer> sizes = new HashMap<>();
+        Map<Integer, Integer> articlesBySize = new TreeMap<>(Comparator.reverseOrder());
         args.forEach(arg -> {
             String[] splitArg = arg.split(" ");
             int amountToAdd = Integer.parseInt(splitArg[0]);
             int articleNr = Integer.parseInt(splitArg[splitArg.length - 1]);
-            Article article = Article.getarticleFromNr(articleNr);
+            Article article = Article.getArticleFromNr(articleNr);
             if (article == null) {
                 System.out.println("artikel " + articleNr + " kunde ej hittas och ignoreras färmed");
                 return;
             }
-            int articleSize = article.getLength();
-            Integer nrOfArticelsSoFar = sizes.getOrDefault(articleSize, 0);
-            nrOfArticelsSoFar += amountToAdd;
-            sizes.put(articleSize, nrOfArticelsSoFar);
+            int articleSize = article.getSize();
+            Integer nrArticlesSoFar = articlesBySize.getOrDefault(articleSize, 0);
+            articlesBySize.put(articleSize, nrArticlesSoFar + amountToAdd);
         });
-        return sizes;
+        return articlesBySize;
     }
 
     static Box findSuitableBox(Map<Integer, Integer> articleSizes) {
@@ -75,26 +74,48 @@ public class BoxFinder {
     }
 
     private static boolean checkIfTotalVolumeIsEnough(Box box, Map<Integer, Integer> articlesSizes) {
-        int totalVolumeNeed = 0;
+        Integer totalVolumeNeed = 0;
         for (Map.Entry<Integer, Integer> entry : articlesSizes.entrySet()) {
             totalVolumeNeed += entry.getKey() * entry.getValue();
         }
         return box.getSize() >= totalVolumeNeed;
     }
 
-    private static boolean fitArticles(Box box, Map<Integer, Integer> articleSizesLeft) {
-
-        Deque<Integer> articlesSorted = new ArrayDeque<>();
+    private static boolean fitArticles(Box box, Map<Integer, Integer> articlesGroupedBySize) {
 
         Map<Integer, Integer> availableSpacePerRow = new HashMap<>();
         for (int i = 1; i <= box.getWidth(); i++) {
             availableSpacePerRow.put(i, box.getLength());
         }
 
-        availableSpacePerRow.forEach((row, spaceLeft) -> {
+        //  Fyll ut varje rad i kartongen. Sätt in så stora artiklar som möjligt per ledigt utrymme
+        for (Map.Entry<Integer, Integer> boxEntry : availableSpacePerRow.entrySet()) {
+            Integer spaceLeftOnRow = boxEntry.getValue();
 
-        });
+            Iterator<Map.Entry<Integer, Integer>> articleIterator = articlesGroupedBySize.entrySet().iterator();
+            while (spaceLeftOnRow > 0 && articleIterator.hasNext()) {
+                Map.Entry<Integer, Integer> articleEntry = articleIterator.next();
+                Integer articleSize = articleEntry.getKey();
+                if (articleSize > spaceLeftOnRow) {
+                    continue;
+                }
 
-        return articleSizesLeft.entrySet().stream().noneMatch(entry -> entry.getValue() > 0);
+                Integer availableArticles = articleEntry.getValue();
+                int nrOfArticlesThatFit = Math.min(spaceLeftOnRow / articleSize, availableArticles);
+                if (nrOfArticlesThatFit > 0) {
+                    spaceLeftOnRow -= nrOfArticlesThatFit * articleSize;
+                    availableArticles -= nrOfArticlesThatFit;
+                    if (availableArticles == 0) {
+                        articleIterator.remove();
+                    } else {
+                        articleEntry.setValue(availableArticles);
+                    }
+                }
+            }
+
+            boxEntry.setValue(spaceLeftOnRow);
+        }
+
+        return articlesGroupedBySize.entrySet().stream().noneMatch(entry -> entry.getValue() > 0);
     }
 }
