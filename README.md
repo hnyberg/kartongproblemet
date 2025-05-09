@@ -45,3 +45,8 @@ Kör jar-filen med 1 Sträng-argument i följande form (exempel): "6 st artikel 
 Programmet skriver då ut vilken kartong som bör användas, i detta fall "kartong nr 2".
 Om ingen lämplig kartong finnes, så skrivs "Upphämtning krävs" ut.
 Felaktigt format på input kommer ge svar om detta, och programmer kommer ej köras vidare.
+
+## Förslag för förbättring
+- Kasta exception om input är felaktig, i stället för att endast printa felmeddelande
+- Regex-kontroll kan optimeras till att köras 1 gång, ej i loop för varje input
+- Regex kan vara mer tolerant mot input, t.ex. fel antal mellanslag

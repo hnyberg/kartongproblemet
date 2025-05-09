@@ -15,7 +15,7 @@ public class BoxFinder {
     public static String findBox(String[] args) {
 
         List<String> arguments = transformInputToListOfArguments(args);
-        boolean allInputHasCorrectFormat = verifyThatNoInputHasIncorrectFormat(arguments);
+        boolean allInputHasCorrectFormat = hasOnlyValidInput(arguments);
         if (!allInputHasCorrectFormat) {
             return "minst 1 indata är i inkorrekt format";
         }
@@ -32,7 +32,7 @@ public class BoxFinder {
                 .toList();
     }
 
-    static Boolean verifyThatNoInputHasIncorrectFormat(List<String> arguments) {
+    static Boolean hasOnlyValidInput(List<String> arguments) {
         return arguments.stream()
                 .filter(arg -> arg == null
                         || arg.isBlank()
@@ -49,7 +49,7 @@ public class BoxFinder {
             int articleNr = Integer.parseInt(splitArg[splitArg.length - 1]);
             Article article = Article.getArticleFromNr(articleNr);
             if (article == null) {
-                System.out.println("artikel " + articleNr + " kunde ej hittas och ignoreras färmed");
+                System.out.println("artikel " + articleNr + " kunde ej hittas och ignoreras därmed");
                 return;
             }
             int articleSize = article.getSize();
@@ -74,7 +74,7 @@ public class BoxFinder {
     }
 
     private static boolean checkIfTotalVolumeIsEnough(Box box, Map<Integer, Integer> articlesSizes) {
-        Integer totalVolumeNeed = 0;
+        int totalVolumeNeed = 0;
         for (Map.Entry<Integer, Integer> entry : articlesSizes.entrySet()) {
             totalVolumeNeed += entry.getKey() * entry.getValue();
         }
@@ -82,6 +82,8 @@ public class BoxFinder {
     }
 
     private static boolean fitArticles(Box box, Map<Integer, Integer> articlesGroupedBySize) {
+
+        HashMap<Integer, Integer> modifiableArticleMap = new HashMap<>(articlesGroupedBySize);
 
         Map<Integer, Integer> availableSpacePerRow = new HashMap<>();
         for (int i = 1; i <= box.getWidth(); i++) {
@@ -92,7 +94,7 @@ public class BoxFinder {
         for (Map.Entry<Integer, Integer> boxEntry : availableSpacePerRow.entrySet()) {
             Integer spaceLeftOnRow = boxEntry.getValue();
 
-            Iterator<Map.Entry<Integer, Integer>> articleIterator = articlesGroupedBySize.entrySet().iterator();
+            Iterator<Map.Entry<Integer, Integer>> articleIterator = modifiableArticleMap.entrySet().iterator();
             while (spaceLeftOnRow > 0 && articleIterator.hasNext()) {
                 Map.Entry<Integer, Integer> articleEntry = articleIterator.next();
                 Integer articleSize = articleEntry.getKey();
@@ -116,6 +118,6 @@ public class BoxFinder {
             boxEntry.setValue(spaceLeftOnRow);
         }
 
-        return articlesGroupedBySize.entrySet().stream().noneMatch(entry -> entry.getValue() > 0);
+        return modifiableArticleMap.entrySet().stream().noneMatch(entry -> entry.getValue() > 0);
     }
 }

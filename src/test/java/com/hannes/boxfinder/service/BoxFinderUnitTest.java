@@ -2,7 +2,6 @@ package com.hannes.boxfinder.service;
 
 import com.hannes.boxfinder.model.Article;
 import com.hannes.boxfinder.model.Box;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -36,7 +35,7 @@ class BoxFinderUnitTest {
         );
     }
 
-    static Stream<Arguments> verifyThatNoInputHasIncorrectFormatCases() {
+    static Stream<Arguments> hasOnlyValidInputCases() {
         return Stream.of(
                 Arguments.of(true, Arrays.asList("6 st artikel 7", "2 st artikel 4", "4 st artikel 1")),
                 Arguments.of(true, Arrays.asList("99 st artikel 99")),
@@ -87,9 +86,9 @@ class BoxFinderUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("verifyThatNoInputHasIncorrectFormatCases")
-    void verifyThatNoInputHasIncorrectFormat(Boolean expected, List<String> input) {
-        assertEquals(expected, BoxFinder.verifyThatNoInputHasIncorrectFormat(input));
+    @MethodSource("hasOnlyValidInputCases")
+    void hasOnlyValidInput(Boolean expected, List<String> input) {
+        assertEquals(expected, BoxFinder.hasOnlyValidInput(input));
     }
 
     @ParameterizedTest
