@@ -10,12 +10,12 @@ public class BoxFinder {
 
     public static final String DENIED = "Upphämtning krävs";
     public static final String BOX_PREFIX = "kartong nr";
-    public static final Pattern INPUT_PATTERN = Pattern.compile("^\\d+\\s+st artikel\\s+\\d+$");
+    public static final Pattern INPUT_PATTERN = Pattern.compile("^\\d*\\s*st\\s*artikel\\s*\\d*$");
 
     public static String findBox(String[] args) throws ArticleNotFoundException {
 
         List<String> arguments = transformInputToListOfArguments(args);
-        boolean allInputHasCorrectFormat = hasOnlyValidInput(arguments);
+        boolean allInputHasCorrectFormat = hasOnlyValidInputFormat(arguments);
         if (!allInputHasCorrectFormat) {
             return "minst 1 indata är i inkorrekt format";
         }
@@ -32,13 +32,11 @@ public class BoxFinder {
                 .toList();
     }
 
-    static Boolean hasOnlyValidInput(List<String> arguments) {
+    static Boolean hasOnlyValidInputFormat(List<String> arguments) {
         return arguments.stream()
-                .filter(arg -> arg == null
-                        || arg.isBlank()
-                        || !INPUT_PATTERN.matcher(arg.toLowerCase().trim()).matches())
-                .toList()
-                .isEmpty();
+                .filter(Objects::nonNull)
+                .map(arg -> arg.toLowerCase().trim())
+                .allMatch(arg -> INPUT_PATTERN.matcher(arg).matches());
     }
 
     static Map<Integer, Integer> getArticleSizesFromInput(List<String> args) throws ArticleNotFoundException {

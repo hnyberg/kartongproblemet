@@ -35,14 +35,15 @@ class BoxFinderUnitTest {
         );
     }
 
-    static Stream<Arguments> hasOnlyValidInputCases() {
+    static Stream<Arguments> hasOnlyValidInputFormatCases() {
         return Stream.of(
                 Arguments.of(true, Arrays.asList("6 st artikel 7", "2 st artikel 4", "4 st artikel 1")),
                 Arguments.of(true, Arrays.asList("99 st artikel 99")),
+                Arguments.of(true, Arrays.asList("6  st  artikel   7")),
+                Arguments.of(true, Arrays.asList("2STARTIKEL3")),
                 Arguments.of(false, Arrays.asList("huehuehue")),
                 Arguments.of(false, Arrays.asList("X st artikel 7")),
-                Arguments.of(false, Arrays.asList("6 st artikel X")),
-                Arguments.of(false, Arrays.asList("6st artikel7"))
+                Arguments.of(false, Arrays.asList("6 st artikel X"))
         );
     }
 
@@ -91,9 +92,9 @@ class BoxFinderUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("hasOnlyValidInputCases")
-    void hasOnlyValidInput(Boolean expected, List<String> input) {
-        assertEquals(expected, BoxFinder.hasOnlyValidInput(input));
+    @MethodSource("hasOnlyValidInputFormatCases")
+    void hasOnlyValidInputFormat(Boolean expected, List<String> input) {
+        assertEquals(expected, BoxFinder.hasOnlyValidInputFormat(input));
     }
 
     @ParameterizedTest
