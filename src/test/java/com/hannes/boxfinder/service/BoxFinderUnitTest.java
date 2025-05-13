@@ -55,9 +55,14 @@ class BoxFinderUnitTest {
                 Arguments.of(
                         Map.of(9, 5),
                         Arrays.asList("2 st artikel 6", "3 st artikel 9")
-                ),
+                )
+        );
+    }
+
+    static Stream<Arguments> nonExistingArticles() {
+        return Stream.of(
                 Arguments.of(
-                        Map.of(),
+                        "artikel 11 ej giltig artikel",
                         Arrays.asList("2 st artikel 11", "3 st artikel 54")
                 )
         );
@@ -75,7 +80,7 @@ class BoxFinderUnitTest {
 
     @ParameterizedTest
     @MethodSource("findBoxCases")
-    void findBox(String expectedResult, String[] input) {
+    void findBox(String expectedResult, String[] input) throws ArticleNotFoundException {
         assertEquals(expectedResult, BoxFinder.findBox(input));
     }
 
@@ -93,8 +98,15 @@ class BoxFinderUnitTest {
 
     @ParameterizedTest
     @MethodSource("getArticleSizesFromInputCases")
-    void getArticleSizesFromInput(Map<Integer, Integer> expected, List<String> input) {
+    void getArticleSizesFromInput(Map<Integer, Integer> expected, List<String> input) throws ArticleNotFoundException {
         assertEquals(new HashMap<>(expected), BoxFinder.getArticleSizesFromInput(input));
+    }
+
+    @ParameterizedTest
+    @MethodSource("nonExistingArticles")
+    void getArticleSizesFromInput_nonExistingArticles(String exceptedErrorMessage, List<String> input) throws ArticleNotFoundException {
+        ArticleNotFoundException anfe = assertThrows(ArticleNotFoundException.class, () -> BoxFinder.getArticleSizesFromInput(input), "");
+        assertEquals(exceptedErrorMessage, anfe.getMessage());
     }
 
     @ParameterizedTest

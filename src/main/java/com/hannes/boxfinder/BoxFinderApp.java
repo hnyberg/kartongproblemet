@@ -1,5 +1,6 @@
 package com.hannes.boxfinder;
 
+import com.hannes.boxfinder.service.ArticleNotFoundException;
 import com.hannes.boxfinder.service.BoxFinder;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -16,7 +17,12 @@ public class BoxFinderApp implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		String answer = BoxFinder.findBox(args);
+		String answer = "";
+		try {
+			answer = BoxFinder.findBox(args);
+		} catch (ArticleNotFoundException anfe) {
+			System.out.println(anfe.getMessage());
+		}
 		System.out.println(answer);
 	}
 }

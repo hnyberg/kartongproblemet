@@ -12,7 +12,7 @@ public class BoxFinder {
     public static final String BOX_PREFIX = "kartong nr";
     public static final Pattern INPUT_PATTERN = Pattern.compile("^\\d+\\s+st artikel\\s+\\d+$");
 
-    public static String findBox(String[] args) {
+    public static String findBox(String[] args) throws ArticleNotFoundException {
 
         List<String> arguments = transformInputToListOfArguments(args);
         boolean allInputHasCorrectFormat = hasOnlyValidInput(arguments);
@@ -41,21 +41,20 @@ public class BoxFinder {
                 .isEmpty();
     }
 
-    static Map<Integer, Integer> getArticleSizesFromInput(List<String> args) {
+    static Map<Integer, Integer> getArticleSizesFromInput(List<String> args) throws ArticleNotFoundException {
         Map<Integer, Integer> articlesBySize = new TreeMap<>(Comparator.reverseOrder());
-        args.forEach(arg -> {
+        for (String arg : args) {
             String[] splitArg = arg.split(" ");
             int amountToAdd = Integer.parseInt(splitArg[0]);
             int articleNr = Integer.parseInt(splitArg[splitArg.length - 1]);
             Article article = Article.getArticleFromNr(articleNr);
             if (article == null) {
-                System.out.println("artikel " + articleNr + " kunde ej hittas och ignoreras därmed");
-                return;
+                throw new ArticleNotFoundException("artikel " + articleNr + " ej giltig artikel");
             }
             int articleSize = article.getSize();
             Integer nrArticlesSoFar = articlesBySize.getOrDefault(articleSize, 0);
             articlesBySize.put(articleSize, nrArticlesSoFar + amountToAdd);
-        });
+        }
         return articlesBySize;
     }
 
